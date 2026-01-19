@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DVE Fashion - Understanding Your Project Scenario</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Canvas-confetti library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+:root{
+--bg-gradient: linear-gradient(-45deg,#dbeafe,#e0f2fe,#e0e7ff);
+--accent:#4f46e5;
+--accent-2:#ec4899;
+--ink:#0f172a;
+--muted:#6b7280;
+--card-bg:rgba(255,255,255,0.96);
+--shadow:0 16px 40px rgba(15,23,42,0.18);
+--good:#22c55e;
+--bad:#f97316;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;}
+body{
+font-family:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+color:var(--ink);
+background:var(--bg-gradient);
+background-size:400% 400%;
+animation:gradientShift 26s ease-in-out infinite;
+}
+.app{
+min-height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:16px;
+}
+.card{
+width:100%;
+max-width:640px;
+background:var(--card-bg);
+border-radius:22px;
+box-shadow:var(--shadow);
+padding:20px 16px 18px;
+}
+/* screens */
+.screen{display:none;}
+.screen.active{display:block;}
+/* headings */
+h1{
+font-size:1.35rem;
+text-align:center;
+margin-bottom:4px;
+color:var(--accent);
+}
+.lead{
+text-align:center;
+font-size:.9rem;
+color:var(--muted);
+margin-bottom:14px;
+}
+.badge{
+display:inline-block;
+padding:4px 10px;
+border-radius:999px;
+font-size:.75rem;
+font-weight:600;
+background:rgba(79,70,229,0.08);
+color:var(--accent);
+margin-bottom:8px;
+}
+/* project topic pill */
+.topic-pill-wrapper{
+text-align:center;
+margin-bottom:6px;
+}
+.topic-pill{
+display:inline-flex;
+align-items:center;
+gap:4px;
+padding:4px 10px;
+border-radius:999px;
+font-size:.8rem;
+font-weight:600;
+background:linear-gradient(135deg,#F6DC43,#AEEA94);
+color:#1e293b;
+}
+/* scenario text */
+.scenario-box{
+background:#f9fafb;
+border-radius:16px;
+padding:12px 12px 10px;
+border:1px solid rgba(148,163,184,0.6);
+box-shadow:0 8px 22px rgba(15,23,42,0.12);
+margin-bottom:10px;
+}
+.sentence{
+padding:6px 4px;
+border-radius:10px;
+font-size:.9rem;
+cursor:pointer;
+position:relative;
+}
+.sentence:not(:last-child){
+border-bottom:1px dashed rgba(148,163,184,0.5);
+}
+.sentence-label{
+position:absolute;
+right:6px;
+top:50%;
+transform:translateY(-50%);
+font-size:.7rem;
+padding:2px 6px;
+border-radius:999px;
+background:#e5e7eb;
+color:#374151;
+}
+.sentence.correct[data-type="background"]{
+background:#fefce8;
+}
+.sentence.correct[data-type="task"]{
+background:#eff6ff;
+}
+.sentence.correct[data-type="problem"]{
+background:#fee2e2;
+}
+.sentence.correct[data-type="start"]{
+background:#e0f2fe;
+}
+/* Chinese translation style - plain text */
+.sentence-zh {
+font-size: 0.82rem;
+color: #64748b;
+font-weight: 400;
+padding: 4px 4px 0 4px;
+line-height: 1.4;
+margin-top: 4px;
+}
+/* category buttons */
+.chips{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-top:10px;
+justify-content:center;
+}
+.chip{
+padding:7px 12px;
+border-radius:999px;
+border:1px solid transparent;
+font-size:.8rem;
+cursor:pointer;
+color:#0f172a;
+background:#e5e7eb;
+box-shadow:0 4px 10px rgba(15,23,42,0.12);
+transition:.16s ease;
+max-width:150px;
+text-align:center;
+}
+.chip span{
+display:block;
+font-size:.72rem;
+color:#4b5563;
+}
+.chip[data-type="background"]{
+background:#fef9c3;
+border-color:#facc15;
+}
+.chip[data-type="task"]{
+background:#dbeafe;
+border-color:#60a5fa;
+}
+.chip[data-type="problem"]{
+background:#fee2e2;
+border-color:#fca5a5;
+}
+.chip[data-type="start"]{
+background:#e0f2fe;
+border-color:#38bdf8;
+}
+.chip.active{
+box-shadow:0 0 0 2px rgba(79,70,229,0.28);
+transform:translateY(-1px);
+}
+/* buttons */
+.btn-row{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-top:12px;
+justify-content:center;
+}
+.btn{
+flex:1 1 auto;
+padding:9px 12px;
+border-radius:999px;
+border:none;
+cursor:pointer;
+font-size:.9rem;
+font-weight:600;
+font-family:inherit;
+transition:.16s ease;
+}
+.btn-primary{
+background:linear-gradient(135deg,var(--accent),var(--accent-2));
+color:#fff;
+box-shadow:0 8px 20px rgba(79,70,229,0.4);
+}
+.btn-secondary{
+background:#fff;
+color:var(--accent);
+border:1px solid rgba(148,163,184,0.8);
+}
+.btn:active{
+transform:scale(.97);
+box-shadow:none;
+}
+.btn-primary:disabled{
+opacity:.4;
+box-shadow:none;
+cursor:default;
+}
+/* feedback & progress */
+.feedback{
+margin-top:8px;
+font-size:.86rem;
+text-align:center;
+color:var(--muted);
+}
+.feedback strong{color:var(--accent);}
+.progress{
+margin-top:4px;
+font-size:.8rem;
+color:var(--muted);
+text-align:center;
+}
+/* quiz (one section at a time) */
+.quiz-card{
+background:#f9fafb;
+border-radius:16px;
+padding:12px 12px 10px;
+border:1px solid rgba(148,163,184,0.6);
+box-shadow:0 8px 22px rgba(15,23,42,0.12);
+margin-bottom:10px;
+}
+.quiz-heading{
+font-size:.95rem;
+font-weight:600;
+}
+.quiz-heading small{
+display:block;
+font-size:.8rem;
+color:#4b5563;
+}
+.quiz-options{
+margin-top:8px;
+display:grid;
+gap:6px;
+}
+.option-btn{
+padding:7px 9px;
+border-radius:12px;
+border:1px solid rgba(148,163,184,0.7);
+background:#fff;
+font-size:.85rem;
+text-align:left;
+cursor:pointer;
+transition:.16s ease;
+position:relative;
+}
+.option-btn.correct{
+border-color:var(--good);
+background:#ecfdf3;
+color:#166534;
+}
+.option-btn.correct::after{
+content:"✓";
+position:absolute;
+right:8px;
+top:50%;
+transform:translateY(-50%);
+font-weight:700;
+color:#16a34a;
+}
+.option-btn.wrong{
+border-color:var(--bad);
+background:#fff7ed;
+color:#9a3412;
+}
+.option-btn.wrong::after{
+content:"✗";
+position:absolute;
+right:8px;
+top:50%;
+transform:translateY(-50%);
+font-weight:700;
+color:#dc2626;
+}
+.option-btn.disabled{
+pointer-events:none;
+opacity:.85;
+}
+/* score */
+.score{
+margin-top:6px;
+font-size:.9rem;
+font-weight:600;
+text-align:center;
+}
+/* background animation */
+@keyframes gradientShift{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="card">
+<!-- SCREEN 1: ACTIVITY 1 -->
+<section class="screen active" data-screen="act1">
+<div style="text-align:center;">
+<span class="badge">DVE Fashion · Project Activity</span>
+<h1>Understanding Your Project</h1>
+<p class="lead">
+Read the project topic and scenario. <br> Choose a section, then tap sentence(s) that match it.<br>
+先看專題題目和情境，再為句子選正確部分。
+</p>
+</div>
+<div class="topic-pill-wrapper">
+<div class="topic-pill">
+Production Project Topic: <br/>Enhancing Competition Designs through Exploration of Alternative Design Techniques and Materials
+</div>
+</div>
+<div class="scenario-box">
+<div class="sentence" data-id="s1">
+Students from the Diploma of Vocational Education (Fashion) participated in the 5th「別出『深』裁時裝設計比賽2025」competition held on 6 September 2025.
+<div class="sentence-zh">時裝文憑學生參加了於2025年9月6日舉行的第五屆「別出『深』裁時裝設計比賽2025」。</div>
+</div>
+<div class="sentence" data-id="s2">
+You may need to find and buy new materials that you did not use before.
+<div class="sentence-zh">你可能需要尋找及購買之前沒有用過的新材料。</div>
+</div>
+<div class="sentence" data-id="s3">
+Choose one design from the competition that you want to improve.
+<div class="sentence-zh">從比賽中選擇一個你想改進的設計。</div>
+</div>
+<div class="sentence" data-id="s4">
+This event was organised by the Sham Shui Po District Youth Development and Civic Education Committee and the Asian New Generation Creativity Design Association.
+<div class="sentence-zh">此活動由深水埗區青年發展及公民教育委員會和亞洲新生代創意設計協會合辦。</div>
+</div>
+<div class="sentence" data-id="s5">
+Review your original competition design and decide what you want to change, improve or enhance.
+<div class="sentence-zh">檢視你原本的比賽設計，並決定你想改變、改進或加強的地方。</div>
+</div>
+<div class="sentence" data-id="s6">
+Some design techniques may take time to learn and practise.
+<div class="sentence-zh">某些設計技巧可能需要時間學習和練習。</div>
+</div>
+<div class="sentence" data-id="s7">
+After the competition, you have a chance to work on your design.
+<div class="sentence-zh">比賽後，你有機會繼續改進你的設計。</div>
+</div>
+<div class="sentence" data-id="s8">
+Look for different materials available in the market.
+<div class="sentence-zh">尋找市場上可用的不同材料。</div>
+</div>
+</div>
+<div class="chips">
+<button class="chip" data-type="background">
+Background<br><span>背景資料</span>
+</button>
+<button class="chip" data-type="task">
+Your Task<br><span>你的任務</span>
+</button>
+<button class="chip" data-type="problem">
+Problems<br><span>潛在問題</span>
+</button>
+<button class="chip" data-type="start">
+Getting Started<br><span>如何開始</span>
+</button>
+</div>
+<div class="progress" id="act1Progress"></div>
+<div class="feedback" id="act1Feedback">
+Tap a section button first, then tap a sentence. 先選部分，再點句子。
+</div>
+<div class="btn-row">
+<button class="btn btn-primary" id="toQuizBtn" disabled>
+Next: Project Plan Quiz ▶
+</button>
+</div>
+</section>
+<!-- SCREEN 2: QUIZ -->
+<section class="screen" data-screen="quiz">
+<div style="text-align:center;">
+<span class="badge">DVE Fashion · Project Quiz</span>
+<h1>Project Understanding Quiz</h1>
+<p class="lead">
+Choose the best sentence<br>
+選出最合適的句子
+</p>
+</div>
+<div class="quiz-card">
+<div class="quiz-heading" id="quizHeading"></div>
+<div class="quiz-heading"><small id="quizHeadingZh"></small></div>
+<div class="quiz-options" id="quizOptions"></div>
+</div>
+<div class="feedback" id="quizFeedback">
+Tap one sentence 點一個句子
+</div>
+<div class="score" id="quizScore"></div>
+<div class="btn-row">
+<button class="btn btn-secondary" id="quizBackBtn">Back to Activity</button>
+<button class="btn btn-primary" id="quizNextBtn">Next section</button>
+</div>
+</section>
+</div>
+</div>
+<script>
+/* ----- Activity 1 mapping ----- */
+const act1Answers = {
+s1:['background'],
+s2:['problem'],
+s3:['task'],
+s4:['background'],
+s5:['start'],
+s6:['problem'],
+s7:['background'],
+s8:['start']
+};
+/* Quiz sections */
+const quizSections = [
+{
+key:'background',
+titleEn:'Background',
+titleZh:'背景資料',
+options:[
+{text:'Students participated in the 5th「別出『深』裁時裝設計比賽2025」competition held on 6 September 2025.', textZh:'學生參加了於2025年9月6日舉行的第五屆「別出『深』裁時裝設計比賽2025」。', correct:true},
+{text:'You may need to find and buy new materials that you did not use before.', textZh:'你可能需要尋找及購買之前沒有用過的新材料。', correct:false},
+{text:'Review your original competition design and decide what you want to change.', textZh:'檢視你原本的比賽設計，並決定你想改變的地方。', correct:false}
+]
+},
+{
+key:'task',
+titleEn:'Your Task',
+titleZh:'你的任務',
+options:[
+{text:'You may need to find and buy new materials.', textZh:'你可能需要尋找及購買新材料。', correct:false},
+{text:'Choose one design from the competition that you want to improve.', textZh:'從比賽中選擇一個你想改進的設計。', correct:true},
+{text:'This event was organised by the Sham Shui Po District committee.', textZh:'此活動由深水埗區委員會舉辦。', correct:false}
+]
+},
+{
+key:'problem',
+titleEn:'Potential Problems',
+titleZh:'潛在問題',
+options:[
+{text:'After the competition, you have a chance to work on your design.', textZh:'比賽後，你有機會繼續改進你的設計。', correct:false},
+{text:'Some design techniques may take time to learn and practise.', textZh:'某些設計技巧可能需要時間學習和練習。', correct:true},
+{text:'Look for different materials available in the market.', textZh:'尋找市場上可用的不同材料。', correct:false}
+]
+},
+{
+key:'start',
+titleEn:'Getting Started',
+titleZh:'如何開始',
+options:[
+{text:'Choose one design from the competition that you want to improve.', textZh:'從比賽中選擇一個你想改進的設計。', correct:false},
+{text:'Some design techniques may take time to learn and practise.', textZh:'某些設計技巧可能需要時間學習和練習。', correct:false},
+{text:'Review your original competition design and decide what you want to change, improve or enhance.', textZh:'檢視你原本的比賽設計，並決定你想改變、改進或加強的地方。', correct:true}
+]
+}
+];
+/* ----- helpers ----- */
+function showScreen(name){
+document.querySelectorAll('.screen').forEach(sec=>{
+sec.classList.toggle('active', sec.dataset.screen === name);
+});
+window.scrollTo({top:0,behavior:'instant'});
+}
+/* ----- Activity 1 ----- */
+let activeType = null;
+const chips = document.querySelectorAll('.chip');
+const sentences = document.querySelectorAll('.sentence');
+const act1Feedback = document.getElementById('act1Feedback');
+const act1Progress = document.getElementById('act1Progress');
+const toQuizBtn = document.getElementById('toQuizBtn');
+chips.forEach(chip=>{
+chip.addEventListener('click',()=>{
+chips.forEach(c=>c.classList.remove('active'));
+if(activeType === chip.dataset.type){
+activeType = null;
+act1Feedback.textContent = 'Tap a section button first, then tap a sentence. 先選部分，再點句子。';
+}else{
+activeType = chip.dataset.type;
+chip.classList.add('active');
+act1Feedback.textContent = `Now tap sentences for ${chip.textContent.trim().split('\n')[0]}.`;
+}
+});
+});
+sentences.forEach(s=>{
+s.addEventListener('click',()=>{
+if(!activeType){
+act1Feedback.textContent = 'Choose a section first. 先選部分。';
+return;
+}
+const id = s.dataset.id;
+const correctTypes = act1Answers[id] || [];
+const already = s.classList.contains('correct') &&
+s.dataset.type === activeType;
+if(already) return;
+if(correctTypes.includes(activeType)){
+s.classList.add('correct');
+s.dataset.type = activeType;
+if(!s.querySelector('.sentence-label')){
+const lab = document.createElement('span');
+lab.className = 'sentence-label';
+lab.textContent = activeType;
+s.appendChild(lab);
+}else{
+s.querySelector('.sentence-label').textContent = activeType;
+}
+act1Feedback.innerHTML = '<strong>Good!</strong> That sentence fits this section.';
+updateAct1Progress();
+}else{
+act1Feedback.textContent = 'Not this section. Try another sentence. 不是這一部分，再試。';
+s.style.transform='translateX(-3px)';
+setTimeout(()=>{s.style.transform='';},120);
+}
+});
+});
+function updateAct1Progress(){
+const needed = Object.keys(act1Answers).length;
+let correctCount = 0;
+sentences.forEach(s=>{
+if(s.classList.contains('correct')) correctCount++;
+});
+act1Progress.textContent = `You have labelled ${correctCount} / ${needed} sentences.`;
+if(correctCount === needed){
+act1Feedback.innerHTML = '<strong>Excellent!</strong> You have found all key sentences.';
+toQuizBtn.disabled = false;
+// Trigger confetti when Task 1 is complete
+confetti({
+particleCount: 150,
+spread: 70,
+origin: { y: 0.6 }
+});
+}
+}
+/* ----- Quiz (one section at a time) ----- */
+let quizIndex = 0;
+let quizCorrect = 0;
+const quizHeading = document.getElementById('quizHeading');
+const quizHeadingZh = document.getElementById('quizHeadingZh');
+const quizOptionsBox = document.getElementById('quizOptions');
+const quizFeedback = document.getElementById('quizFeedback');
+const quizScore = document.getElementById('quizScore');
+const quizBackBtn = document.getElementById('quizBackBtn');
+const quizNextBtn = document.getElementById('quizNextBtn');
+function showQuizSection(){
+const sec = quizSections[quizIndex];
+quizHeading.textContent = sec.titleEn;
+quizHeadingZh.textContent = sec.titleZh;
+quizOptionsBox.innerHTML = '';
+quizFeedback.textContent = 'Tap one sentence. 點一個句子。';
+quizScore.textContent = `Section ${quizIndex+1} / ${quizSections.length}`;
+sec.options.forEach(opt=>{
+const btn = document.createElement('button');
+btn.className = 'option-btn';
+btn.dataset.correct = opt.correct ? '1' : '0';
+btn.innerHTML = opt.text + '<div class="sentence-zh">' + opt.textZh + '</div>';
+btn.addEventListener('click',()=>onOptionClick(btn));
+quizOptionsBox.appendChild(btn);
+});
+quizNextBtn.disabled = true;
+}
+function onOptionClick(btn){
+const all = quizOptionsBox.querySelectorAll('.option-btn');
+all.forEach(b=>b.classList.add('disabled'));
+const isCorrect = btn.dataset.correct === '1';
+if(isCorrect){
+btn.classList.add('correct');
+quizFeedback.textContent = 'Correct! 做得好！';
+quizCorrect++;
+// Trigger confetti for each correct answer in Task 2
+confetti({
+particleCount: 100,
+spread: 60,
+origin: { y: 0.6 }
+});
+}else{
+btn.classList.add('wrong');
+const correctBtn = Array.from(all).find(b=>b.dataset.correct==='1');
+if(correctBtn) correctBtn.classList.add('correct');
+quizFeedback.textContent = 'Not the correct choice. Look at the green sentence. 留意綠色句子。';
+}
+if(quizIndex === quizSections.length-1){
+quizNextBtn.textContent = 'See result';
+}else{
+quizNextBtn.textContent = 'Next section';
+}
+quizNextBtn.disabled = false;
+}
+quizNextBtn.addEventListener('click',()=>{
+if(quizIndex < quizSections.length-1){
+quizIndex++;
+showQuizSection();
+}else{
+quizScore.textContent = `You got ${quizCorrect} / ${quizSections.length} sections correct. 你答對 ${quizCorrect} 個部分。`;
+if(quizCorrect === quizSections.length){
+quizFeedback.textContent = 'Excellent! All sections are correct.';
+// Trigger bigger confetti celebration for completing all quiz sections perfectly
+confetti({
+particleCount: 200,
+spread: 100,
+origin: { y: 0.5 }
+});
+}else{
+quizFeedback.textContent = 'Check the green sentences to see the correct answers. 留意綠色句子。';
+}
+quizNextBtn.disabled = true;
+}
+});
+quizBackBtn.addEventListener('click',()=>{
+showScreen('act1');
+});
+/* ----- navigation ----- */
+toQuizBtn.addEventListener('click',()=>{
+quizIndex = 0;
+quizCorrect = 0;
+quizNextBtn.disabled = true;
+quizNextBtn.textContent = 'Next section';
+showQuizSection();
+showScreen('quiz');
+});
+/* init */
+updateAct1Progress();
+</script>
+</body>
+</html>
